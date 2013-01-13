@@ -1,0 +1,122 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+	<xs:simpleType name="JavaPackageName">
+		<xs:restriction base="xs:token">
+			<xs:pattern value="([\p{L}_$][\p{L}\p{N}_$]*\.)*[\p{L}_$][\p{L}\p{N}_$]*"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="JavaIdentifier">
+		<xs:restriction base="xs:token">
+			<xs:pattern value="[\p{L}_$][\p{L}\p{N}_$]*"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:simpleType name="RelativePath">
+		<xs:restriction base="xs:token">
+			<xs:pattern value="([\p{L}_$][\p{L}\p{N}_$]*/)*[\p{L}_$][\p{L}\p{N}_$]*"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="Macro">
+		<xs:attribute name="name" type="JavaIdentifier" use="required"/>
+		<xs:attribute name="expr" type="xs:string" use="required"/>
+	</xs:complexType>
+	
+	<xs:complexType name="StateDecl">
+		<xs:attribute name="name" type="JavaIdentifier" use="required"/>
+		<xs:attribute name="strict" type="xs:boolean" default="false"/>
+	</xs:complexType>
+	
+	<xs:complexType name="PushState">
+		<xs:attribute name="name" type="JavaIdentifier" use="required"/>
+	</xs:complexType>
+	
+	<xs:complexType name="PopState"/>
+	
+	<xs:complexType name="JumpState">
+		<xs:attribute name="name" type="JavaIdentifier" use="required"/>
+	</xs:complexType>
+	
+	<xs:complexType name="StateRef">
+		<xs:attribute name="name" type="JavaIdentifier" use="required"/>
+	</xs:complexType>
+	
+	<xs:complexType name="Rule">
+		<xs:choice minOccurs="0">
+			<xs:element name="PushState" type="PushState"/>
+			<xs:element name="PopState" type="PopState"/>
+			<xs:element name="JumpState" type="JumpState"/>
+		</xs:choice>
+		<xs:attribute name="expr" type="xs:string" use="required"/>
+		<xs:attribute name="event" type="JavaIdentifier"/>
+		<xs:attribute name="pri" type="xs:integer" default="0"/>
+	</xs:complexType>
+	
+	<xs:complexType name="RuleGroup">
+		<xs:sequence>
+			<xs:element name="State" type="StateRef" maxOccurs="unbounded"/>
+			<xs:element name="Rule" type="Rule" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="LexerSpec">
+		<xs:sequence>
+			<xs:element name="Package" type="JavaPackageName" minOccurs="0"/>
+			<xs:element name="Prefix" type="JavaIdentifier" minOccurs="0"/>
+			<xs:element name="StateListener" type="xs:boolean" default="false" minOccurs="0"/>
+			<xs:element name="Loggers" type="xs:boolean" default="false" minOccurs="0"/>
+			<xs:element name="ResourcePath" type="RelativePath" minOccurs="0"/>
+			
+			<xs:element name="PublicStateChangeMethods" type="xs:boolean" default="false" minOccurs="0"/>
+			<xs:element name="FinalClasses" type="xs:boolean" default="false" minOccurs="0"/>
+			
+			<xs:element name="State" type="StateDecl" maxOccurs="unbounded"/>
+			<xs:element name="InitialState" type="JavaIdentifier"/>
+			<xs:element name="Macro" type="Macro" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="RuleGroup" type="RuleGroup" maxOccurs="unbounded">
+			
+				<xs:key name="StatesUniqueInRuleGroup">
+					<xs:selector xpath="State"/>
+					<xs:field xpath="@name"/>
+				</xs:key>
+				
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:element name="LexerSpec" type="LexerSpec">
+	
+		<xs:key name="StateNamesUniqueInSpec">
+			<xs:selector xpath="State"/>
+			<xs:field xpath="@name"/>
+		</xs:key>
+
+		<xs:key name="MacroNamesUniqueInSpec">
+			<xs:selector xpath="Macro"/>
+			<xs:field xpath="@name"/>
+		</xs:key>
+		
+		<xs:keyref name="InitialStateRefsDeclaredState" refer="StateNamesUniqueInSpec">
+			<xs:selector xpath="InitialState"/>
+			<xs:field xpath="."/>
+		</xs:keyref>
+		
+		<xs:keyref name="RuleGroupStatesRefDeclaredStates" refer="StateNamesUniqueInSpec">
+			<xs:selector xpath="RuleGroup/State"/>
+			<xs:field xpath="@name"/>
+		</xs:keyref>
+
+		<xs:keyref name="PushStatesRefDeclaredStates" refer="StateNamesUniqueInSpec">
+			<xs:selector xpath="RuleGroup/Rule/PushState"/>
+			<xs:field xpath="@name"/>
+		</xs:keyref>
+		
+		<xs:keyref name="JumpStatesRefDeclaredStates" refer="StateNamesUniqueInSpec">
+			<xs:selector xpath="RuleGroup/Rule/JumpState"/>
+			<xs:field xpath="@name"/>
+		</xs:keyref>
+		
+	</xs:element>
+
+</xs:schema>
