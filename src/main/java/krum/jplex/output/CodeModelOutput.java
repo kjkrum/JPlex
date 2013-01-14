@@ -88,7 +88,7 @@ public class CodeModelOutput {
 		lexer();
 	}
 	
-	public void build(File outputDir) throws IOException {
+	public void build(File javaRoot, File resourceRoot) throws IOException {
 		
 		// compile automatons for each state
 		Map<State, TokenAutomaton> automatons = new HashMap<State, TokenAutomaton>();
@@ -126,7 +126,7 @@ public class CodeModelOutput {
 		}
 		
 		// serialize automatons
-		File resourceDir = new File(outputDir, spec.resourcePath());
+		File resourceDir = new File(resourceRoot, spec.resourcePath());
 		if(!resourceDir.exists()) resourceDir.mkdirs();
 		for(State s : spec.states()) {
 			System.out.println(spec.resourcePath() + "/" + s.getName() + ".automaton.gz");
@@ -137,7 +137,8 @@ public class CodeModelOutput {
 			gzout.close();
 		}
 
-		cm.build(outputDir);
+		javaRoot.mkdirs();
+		cm.build(javaRoot);
 	}
 	
 	

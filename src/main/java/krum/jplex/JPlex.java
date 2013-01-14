@@ -56,29 +56,36 @@ public class JPlex {
 	 * strictness, etc. state fields and get rid of maps in lexer class.
 	 */
 
-	public static final String VERSION = "1.0";
+	public static final String VERSION = "1.1";
 	
 	public static void main(String[] args) {
 		System.out.println("JPlex version " + VERSION);
 		
-		if(args.length < 1 || args.length > 2) {
-			System.err.println("usage: jplex input-file [output-dir]");	
+		if(args.length < 1 || args.length > 3) {
+			System.err.println("usage: jplex input-file [java-dir [resource-dir]]");	
 			System.exit(1);
 		}
 		
 		File inputFile = new File(args[0]);
-		File outputDir;
-		if(args.length == 2) {
-			outputDir = new File(args[1]);
+		File javaDir;
+		if(args.length >= 2) {
+			javaDir = new File(args[1]);
 		}
 		else {
-			outputDir = new File(".");
+			javaDir = new File(".");
+		}
+		File resourceDir;
+		if(args.length == 3) {
+			resourceDir = new File(args[2]);
+		}
+		else {
+			resourceDir = javaDir;
 		}
 		
 		try {
 			LexerSpec spec = XMLInput.load(inputFile);
 			CodeModelOutput cm = new CodeModelOutput(spec);
-			cm.build(outputDir);
+			cm.build(javaDir, resourceDir);
 		} catch (Exception e) {
 			String msg = e.getMessage();
 			if(msg != null) System.err.println(msg);
