@@ -90,6 +90,7 @@ public class JPlex {
 			String msg = e.getMessage();
 			if(msg != null) System.err.println(msg);
 			else e.printStackTrace();
+			System.exit(1);
 		}
 	}
 }
