@@ -2,6 +2,8 @@ package krum.jplex.input;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,7 +17,7 @@ import org.w3c.dom.NodeList;
 public class RuleGroup {
 	
 	protected Set<State> states = new HashSet<State>();
-	protected Set<Rule> rules = new HashSet<Rule>();
+	protected List<Rule> rules = new LinkedList<Rule>();
 
 	protected RuleGroup(XPath xp, Node node, final Map<String, State> stateMap) throws XPathExpressionException {
 		NodeList stateNodes =
@@ -38,7 +40,7 @@ public class RuleGroup {
 	}
 	
 	public Collection<Rule> getRules() {
-		return new HashSet<Rule>(rules);
+		return new LinkedList<Rule>(rules);
 	}
 
 }

@@ -122,7 +122,7 @@ public class CodeModelOutput {
 			else {
 				System.err.println("Warning: no rules in state " + s.getName()); // TODO: move this to input validator?
 			}
-			automatons.put(s, new TokenAutomaton(a));
+			automatons.put(s, new TokenAutomaton(a, true, true));
 		}
 		
 		// serialize automatons
@@ -143,7 +143,12 @@ public class CodeModelOutput {
 	
 	
 	protected void exceptions() throws JClassAlreadyExistsException {
-		underflowClass = cm._class(JMod.PUBLIC, "krum.jplex.UnderflowException", ClassType.CLASS);
+		String pkg = spec.package_();
+		if(!"".equals(pkg)) {
+			pkg += ".";
+		}
+		
+		underflowClass = cm._class(JMod.PUBLIC, pkg + "UnderflowException", ClassType.CLASS);
 		underflowClass._extends(IOException.class);
 		underflowClass.field(JMod.PRIVATE + JMod.STATIC + JMod.FINAL, long.class, "serialVersionUID", JExpr.lit(1L));
 		underflowClass.direct("// GENERATED CODE - DO NOT EDIT!");
@@ -165,7 +170,7 @@ public class CodeModelOutput {
 		ctor.body().directStatement("super(message, cause);");
 		
 		if(anyStateIsStrict) {
-			unmatchedClass = cm._class(JMod.PUBLIC, "krum.jplex.UnmatchedInputException", ClassType.CLASS);
+			unmatchedClass = cm._class(JMod.PUBLIC, pkg + "UnmatchedInputException", ClassType.CLASS);
 			unmatchedClass._extends(IOException.class);
 			unmatchedClass.field(JMod.PRIVATE + JMod.STATIC + JMod.FINAL, long.class, "serialVersionUID", JExpr.lit(1L));
 			unmatchedClass.field(JMod.PROTECTED + JMod.FINAL, int.class, "index");

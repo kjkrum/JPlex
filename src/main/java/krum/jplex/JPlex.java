@@ -6,7 +6,6 @@ import krum.jplex.input.LexerSpec;
 import krum.jplex.input.XMLInput;
 import krum.jplex.output.CodeModelOutput;
 
-
 /**
  * Main class of the JPlex lexer generator.  JPlex lexers are NIO-based,
  * DFA-powered, push-driven, and fully decoupled and reusable. Their state
@@ -30,12 +29,12 @@ import krum.jplex.output.CodeModelOutput;
  * <p>
  * JPlex supports multiple lexical states with push, pop, and jump.  This
  * makes it easy to recognize patterns like nested block comments.  In states
- * that are not declared <tt>strict</tt>, unrecognized input will be discarded
+ * that are not declared <tt>strict</tt>, unrecognized input will be skipped
  * in the lexer's innermost loop.
  * 
  * @author Kevin Krumwiede (kjkrum@gmail.com)
  */
-public class JPlex {
+public class JPlex implements Version {
 	/* 
 	 * BASIC OPERATION:
 	 * The main class constructs a krum.jplex.input.LexerSpec from an
@@ -50,19 +49,26 @@ public class JPlex {
 	 * equals or hashCode, so they rely on identity for the correct behavior
 	 * of HashMap and other collections.  Anyone who modifies this program
 	 * should be wary of creating copies of those objects.
-	 * 
-	 * TODO:
-	 * Change state enum into a class with public static instances; make
-	 * strictness, etc. state fields and get rid of maps in lexer class.
 	 */
-
-	public static final String VERSION = "1.1";
-	
 	public static void main(String[] args) {
+		// this works but i don't like it
+		/*
+		Properties p = new Properties();
+        InputStream is = JPlex.class.getResourceAsStream("/META-INF/maven/com.chalcodes.jplex/JPlex/pom.properties");
+        if (is != null) {
+            try {
+				p.load(is);
+			} catch (IOException e) {
+				// ignore
+			}
+        }
+        final String version = p.getProperty("version", "missing");
+        */
+		
 		System.out.println("JPlex version " + VERSION);
 		
 		if(args.length < 1 || args.length > 3) {
-			System.err.println("usage: jplex input-file [java-dir [resource-dir]]");	
+			System.err.println("usage: jplex input-file [java-output-dir [resource-output-dir]]");	
 			System.exit(1);
 		}
 		

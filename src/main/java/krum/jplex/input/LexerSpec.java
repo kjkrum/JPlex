@@ -32,7 +32,7 @@ public class LexerSpec {
 	protected Map<String, State> states = new HashMap<String, State>();
 	protected State initialState;
 	protected Map<String, Macro> macros = new HashMap<String, Macro>();
-	protected Set<RuleGroup> ruleGroups = new HashSet<RuleGroup>();
+	protected List<RuleGroup> ruleGroups = new LinkedList<RuleGroup>();
 
 	protected LexerSpec(XPath xp, Node node) throws XPathExpressionException, ValidationException {
 		package_ = (String) xp.evaluate("LexerSpec/Package/text()", node, XPathConstants.STRING);
@@ -198,7 +198,7 @@ public class LexerSpec {
 	}
 	
 	public Collection<RuleGroup> ruleGroups() {
-		return new HashSet<RuleGroup>(ruleGroups);
+		return new LinkedList<RuleGroup>(ruleGroups);
 	}
 
 	public State initialState() {
